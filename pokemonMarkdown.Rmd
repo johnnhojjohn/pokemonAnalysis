@@ -1,0 +1,150 @@
+---
+title: "pokemonAnalysisForFun"
+author: "J"
+date: "2024-12-27"
+output: html_document
+---
+
+Just for fun analysis of Pokemon :)
+
+```{r message=FALSE, warning=FALSE}
+pacman::p_load(
+  rio,          # File import
+  here,         # File locator
+  skimr,        # get overview of data
+  tidyverse,    # data management + ggplot2 graphics, 
+  gtsummary,    # summary statistics and tests
+  rstatix,      # statistics
+  corrr,        # correlation analayis for numeric variables
+  janitor,      # adding totals and percents to tables
+  flextable     # converting tables to HTML
+)
+```
+
+Import data
+
+```{r}
+pokemon <- import("Pokemon.csv")
+```
+
+Exploratory Data Analysis
+
+preview of the data
+```{r}
+skim(pokemon)
+```
+
+taking a look at the structure/type
+```{r}
+str(pokemon)
+```
+
+Cleaning Up Names (making it into lower case and switching space for underscore)
+
+```{r}
+pokemon <- pokemon %>% janitor::clean_names()
+
+str(pokemon)
+```
+
+~Question how many pokemon have only 1 Type vs 2 Types?
+
+Using Skimr, 386 are empty in Type 2, so 800-386= 414 pokemon only have 1 Type, including Megas and 
+different forms
+
+~Question why are there 19 unique pokemon in Type 2?
+
+```{r}
+unique(pokemon$type_2)
+```
+"" is considered a type
+
+Let's replace all "" in Type 2 with NAs
+
+```{r}
+pokemon$type_2 <- na_if(pokemon$type_2, "")
+
+skim(pokemon)
+```
+This kept type_2 as a character type and replaced all the "" with NAs
+
+What is the most common Type 1 and Type 2 groupings?
+
+```{r}
+pokemon %>% group_by(type_1, type_2) %>% 
+  tally(sort=T) %>% 
+  ungroup()
+```
+
+How many pokemon are there (including Megas and Forms)?
+```{r}
+pokemon %>% group_by(generation) %>% 
+  tally(sort=T) %>% 
+  ungroup()
+```
+
+Making a pivot table with stats all in one column
+```{r}
+poke_pivot_long <- pokemon %>% pivot_longer(
+  cols     = c('total':'speed'),
+  names_to = 'stats',
+  values_to= 'y'
+)
+
+```
+
+Plotting these values
+```{r}
+ggplot(data=poke_pivot_long) +
+    geom_density(aes(x=y, group=stats, fill=stats), alpha=0.4)
+```
+All stats with the exception of total is all grouped similarily but.. total is a bit odd.
+
+Let's try but with boxplots now
+
+```{r}
+ggplot(data=poke_pivot_long) +
+    geom_boxplot(aes(x=y, group=stats, fill=stats), 
+                 alpha=0.4, 
+                 outlier.colour="red",
+                 outlier.fill="red",
+                 outlier.size=3)
+```
+That makes sense since Total is the addition of everything *facepalm*
+
+Let's pivot wider the table back to normal
+
+```{r}
+pokemon <- poke_pivot_long %>%
+  pivot_wider(names_from = stats, values_from = y)
+
+pokemon
+```
+
+
+
+
+
+
+
+
+Let's make a boxplot of Total
+
+
+
+
+
+
+
+detect outliers by type, and other columns
+
+
+
+
+
+
+make a histogram
+
+
+make a correlation table
+
