@@ -83,10 +83,10 @@ pokemon %>% group_by(generation) %>%
   ungroup()
 ```
 
-Making a pivot table with stats all in one column
+Making a pivot table with stats all in one column, with the exception of total
 ```{r}
 poke_pivot_long <- pokemon %>% pivot_longer(
-  cols     = c('total':'speed'),
+  cols     = c('hp':'speed'),
   names_to = 'stats',
   values_to= 'y'
 )
@@ -98,7 +98,6 @@ Plotting these values
 ggplot(data=poke_pivot_long) +
     geom_density(aes(x=y, group=stats, fill=stats), alpha=0.4)
 ```
-All stats with the exception of total is all grouped similarily but.. total is a bit odd.
 
 Let's try but with boxplots now
 
@@ -112,39 +111,28 @@ ggplot(data=poke_pivot_long) +
 ```
 That makes sense since Total is the addition of everything *facepalm*
 
-Let's pivot wider the table back to normal
+
+
+
+
+
+
+Let's see how well pokemon stats correlate with each other
 
 ```{r}
-pokemon <- poke_pivot_long %>%
-  pivot_wider(names_from = stats, values_from = y)
+correlation_stats <- pokemon %>% 
+  select(hp, attack, defense, sp_atk, sp_def, speed) %>% 
+  correlate()
 
-pokemon
+correlation_stats
 ```
 
+plotting correlation table
+```{r}
+rplot(correlation_stats)
+```
+
+Stats are weakly correlated with each other, some topping around 0.5 and as low as 0.1
 
 
-
-
-
-
-
-Let's make a boxplot of Total
-
-
-
-
-
-
-
-detect outliers by type, and other columns
-
-
-
-
-
-
-make a histogram
-
-
-make a correlation table
 
