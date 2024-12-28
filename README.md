@@ -1,1 +1,1 @@
-Doing from analysis and practicing on pokemon data :) 
+Doing some analysis and practicing on pokemon data :) 
