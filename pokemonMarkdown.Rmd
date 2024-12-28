@@ -135,4 +135,10 @@ rplot(correlation_stats)
 Stats are weakly correlated with each other, some topping around 0.5 and as low as 0.1
 
 
+ADDED NEW
+
+try to compare difference between all the 6 stats
+use normal vs normal, then normal vs leg, then within legendnardy
+
+
 
