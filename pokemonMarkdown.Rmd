@@ -5,6 +5,12 @@ date: "2024-12-27"
 output: html_document
 ---
 
+
+
+12/31 = What to improve on: Making things look pretty, need to review notes more
+
+
+
 Just for fun analysis of Pokemon :)
 
 ```{r message=FALSE, warning=FALSE}
@@ -109,12 +115,25 @@ ggplot(data=poke_pivot_long) +
                  outlier.fill="red",
                  outlier.size=3)
 ```
-That makes sense since Total is the addition of everything *facepalm*
 
+Reordering boxplots to match it with legend
 
+```{r}
+poke_pivot_long$stats <- factor(poke_pivot_long$stats,
+                                 levels = c("speed", "sp_def", "sp_atk", "hp", "defense", "attack"))
+```
 
+played around with the parameters in aes 
 
-
+```{r}
+ggplot(data=poke_pivot_long) +
+    geom_boxplot(aes(x=y, y=stats), 
+                 alpha=0.4, 
+                 outlier.colour="red",
+                 outlier.fill="red",
+                 outlier.size=3)
+```
+ok now attack is on top.. but they legend is out of order, so maybe I have to move the legend instead
 
 
 Let's see how well pokemon stats correlate with each other
@@ -135,10 +154,43 @@ rplot(correlation_stats)
 Stats are weakly correlated with each other, some topping around 0.5 and as low as 0.1
 
 
-ADDED NEW
+single variable analysis
 
-try to compare difference between all the 6 stats
-use normal vs normal, then normal vs leg, then within legendnardy
+what is the most common pokemon type 1?
+
+```{r}
+pokemon %>% 
+  group_by(type_1) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count))
+```
+
+what is the most common pokemon type 2?
+
+```{r}
+pokemon %>% 
+  group_by(type_2) %>% 
+  summarise(count = n()) %>% 
+  top_n(n=10,wt = count) %>% 
+  arrange(desc(count)) %>% 
+  as.data.frame(na.rm=TRUE)
+```
+
+what is most cmmon type1-2?
 
 
+difference total legendary vs non-legendary?
 
+```{r}
+pokemon %>% group_by(legendary) %>% 
+    summarise(count = n(),
+              hp = mean(hp),
+              attack = mean(attack),
+              defense = mean(defense),
+              sp_atk = mean(sp_atk),
+              sp_def = mean(sp_def),
+              speed = mean(speed)
+              ) 
+```
+
+Pretty telling that legendary pokemon are much stronger
